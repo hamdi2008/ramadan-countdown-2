@@ -17,13 +17,48 @@
       font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
       color: #f5ecd7;
       background: radial-gradient(ellipse at top, #1d2b53 0%, #0b1026 60%, #05070f 100%);
+      background-attachment: fixed;
       text-align: center;
+      overflow-x: hidden;
+    }
+
+    #sky {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
 
     .moon {
       font-size: 64px;
       margin-bottom: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      line-height: 1;
       filter: drop-shadow(0 0 18px rgba(255, 215, 120, 0.6));
+      transition: transform 0.4s ease;
+    }
+    .moon:hover { transform: scale(1.1) rotate(-8deg); }
+    .moon:focus-visible { outline: 2px solid #ffd778; outline-offset: 6px; border-radius: 50%; }
+
+    .moon-hint {
+      font-size: 0.8rem;
+      color: #ffd778;
+      min-height: 1.2em;
+      margin-bottom: 8px;
+      opacity: 0.8;
     }
 
     h1 {
@@ -36,15 +71,40 @@
     .subtitle {
       font-size: 1.05rem;
       opacity: 0.85;
-      margin-bottom: 40px;
+      margin-bottom: 28px;
+    }
+
+    .modes {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(255, 215, 120, 0.35);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .modes button {
+      font: inherit;
+      font-size: 0.85rem;
+      color: #f5ecd7;
+      background: none;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      cursor: pointer;
+    }
+    .modes button[aria-pressed="true"] {
+      background: #ffd778;
+      color: #0b1026;
+      font-weight: 600;
     }
 
     .countdown {
       display: grid;
-      grid-template-columns: repeat(5, minmax(0, 1fr));
+      grid-template-columns: repeat(var(--cols, 5), minmax(0, 1fr));
       gap: 14px;
       width: 100%;
-      max-width: 720px;
     }
 
     .unit {
@@ -53,6 +113,11 @@
       border-radius: 14px;
       padding: 20px 6px;
       backdrop-filter: blur(4px);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    .unit:hover {
+      transform: translateY(-4px);
+      border-color: rgba(255, 215, 120, 0.8);
     }
 
     .value {
@@ -61,6 +126,12 @@
       font-weight: 700;
       font-variant-numeric: tabular-nums;
       color: #fff;
+      overflow-wrap: anywhere;
+    }
+    .value.tick { animation: tick 0.35s ease; }
+    @keyframes tick {
+      0% { transform: translateY(-6px); opacity: 0.3; }
+      100% { transform: translateY(0); opacity: 1; }
     }
 
     .label {
@@ -72,52 +143,168 @@
       color: #ffd778;
     }
 
+    .progress {
+      width: 100%;
+      margin-top: 28px;
+      text-align: left;
+    }
+    .progress-bar {
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #c9973b, #ffd778);
+      transition: width 0.6s ease;
+    }
+    .progress-text {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 0.8rem;
+      opacity: 0.75;
+    }
+
     .message {
       margin-top: 40px;
       font-size: 1.4rem;
       color: #ffd778;
     }
 
-    .note {
+    .panel {
+      width: 100%;
       margin-top: 32px;
+      padding: 20px;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 215, 120, 0.25);
+      border-radius: 14px;
+    }
+    .panel h2 {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      font-size: 1.1rem;
+      color: #ffd778;
+      margin-bottom: 12px;
+    }
+    .panel h2 small {
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: #f5ecd7;
+      opacity: 0.75;
+    }
+
+    .checklist { list-style: none; display: grid; gap: 8px; }
+    .checklist label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .checklist label:hover { background: rgba(255, 255, 255, 0.06); }
+    .checklist input {
+      width: 18px;
+      height: 18px;
+      accent-color: #ffd778;
+      flex-shrink: 0;
+    }
+    .checklist input:checked + span { text-decoration: line-through; opacity: 0.6; }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 24px;
+    }
+    .btn {
+      font: inherit;
+      font-size: 0.9rem;
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1px solid #ffd778;
+      background: rgba(255, 215, 120, 0.1);
+      color: #ffd778;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+    .btn:hover { background: rgba(255, 215, 120, 0.25); }
+
+    .note {
+      margin-top: 24px;
       font-size: 0.85rem;
       opacity: 0.6;
     }
 
     @media (max-width: 520px) {
-      .countdown { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .countdown { grid-template-columns: repeat(min(var(--cols, 5), 3), minmax(0, 1fr)); }
+      .modes button { padding: 6px 10px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
     }
   </style>
 </head>
 <body>
-  <div class="moon">🌙</div>
-  <h1>Ramadan Countdown</h1>
-  <p class="subtitle">Ramadan 1448 is expected to begin on the evening of Sunday, February 7, 2027</p>
+  <canvas id="sky" aria-hidden="true"></canvas>
 
-  <div class="countdown" id="countdown">
-    <div class="unit"><span class="value" id="months">0</span><span class="label">Months</span></div>
-    <div class="unit"><span class="value" id="days">0</span><span class="label">Days</span></div>
-    <div class="unit"><span class="value" id="hours">00</span><span class="label">Hours</span></div>
-    <div class="unit"><span class="value" id="minutes">00</span><span class="label">Minutes</span></div>
-    <div class="unit"><span class="value" id="seconds">00</span><span class="label">Seconds</span></div>
-  </div>
+  <main>
+    <button class="moon" id="moon" type="button" aria-label="Change the moon phase">🌙</button>
+    <p class="moon-hint" id="moonHint">Tap the moon · tap the sky for shooting stars</p>
 
-  <p class="message" id="message" hidden>Ramadan Mubarak! 🌙</p>
-  <p class="note">Counting down to 6:00 PM (your local time). Actual start depends on the moon sighting.</p>
+    <h1>Ramadan Countdown</h1>
+    <p class="subtitle">Ramadan 1448 is expected to begin on the evening of Sunday, February 7, 2027</p>
+
+    <div class="modes" role="group" aria-label="Countdown format">
+      <button type="button" data-mode="calendar" aria-pressed="true">Months</button>
+      <button type="button" data-mode="days" aria-pressed="false">Days</button>
+      <button type="button" data-mode="hours" aria-pressed="false">Hours</button>
+      <button type="button" data-mode="seconds" aria-pressed="false">Seconds</button>
+    </div>
+
+    <div class="countdown" id="countdown"></div>
+
+    <div class="progress" id="progress">
+      <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-text">
+        <span>Eid al-Fitr 1447</span>
+        <span id="progressPct">0%</span>
+        <span>Ramadan 1448</span>
+      </div>
+    </div>
+
+    <p class="message" id="message" hidden>Ramadan Mubarak! 🌙</p>
+
+    <section class="panel">
+      <h2>Get ready for Ramadan <small id="readyCount">0 of 0 done</small></h2>
+      <ul class="checklist" id="checklist"></ul>
+    </section>
+
+    <div class="actions">
+      <button class="btn" id="share" type="button">Share countdown</button>
+    </div>
+
+    <p class="note">Counting down to 6:00 PM (your local time). Actual start depends on the moon sighting.</p>
+  </main>
 
   <script>
     // Evening of Sunday, February 7, 2027 at 6:00 PM local time
     const target = new Date(2027, 1, 7, 18, 0, 0);
-
-    const els = {
-      months: document.getElementById("months"),
-      days: document.getElementById("days"),
-      hours: document.getElementById("hours"),
-      minutes: document.getElementById("minutes"),
-      seconds: document.getElementById("seconds"),
-    };
+    // Eid al-Fitr 1447 (approx. March 20, 2026), used as the start of the progress bar
+    const lastEid = new Date(2026, 2, 20, 0, 0, 0);
 
     const pad = (n) => String(n).padStart(2, "0");
+    const fmt = (n) => n.toLocaleString();
 
     function addMonths(date, n) {
       const d = new Date(date);
@@ -128,38 +315,265 @@
       return d;
     }
 
+    // Safe localStorage helpers (storage can be blocked in private windows)
+    const store = {
+      get(key, fallback) {
+        try { const v = localStorage.getItem(key); return v === null ? fallback : JSON.parse(v); }
+        catch { return fallback; }
+      },
+      set(key, value) {
+        try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+      },
+    };
+
+    // ----- Countdown -----
+    const modes = {
+      calendar: ["months", "days", "hours", "minutes", "seconds"],
+      days: ["days", "hours", "minutes", "seconds"],
+      hours: ["hours", "minutes", "seconds"],
+      seconds: ["seconds"],
+    };
+
+    const countdownEl = document.getElementById("countdown");
+    let mode = store.get("mode", "calendar");
+    if (!modes[mode]) mode = "calendar";
+    let valueEls = {};
+
+    function buildUnits() {
+      countdownEl.innerHTML = "";
+      valueEls = {};
+      countdownEl.style.setProperty("--cols", modes[mode].length);
+      for (const unit of modes[mode]) {
+        const div = document.createElement("div");
+        div.className = "unit";
+        div.innerHTML = `<span class="value"></span><span class="label">${unit}</span>`;
+        countdownEl.appendChild(div);
+        valueEls[unit] = div.querySelector(".value");
+      }
+      document.querySelectorAll(".modes button").forEach((b) => {
+        b.setAttribute("aria-pressed", b.dataset.mode === mode);
+      });
+    }
+
+    function remaining(now) {
+      let months = 0;
+      let from = now;
+      if (mode === "calendar") {
+        // Count whole calendar months first, then the remainder
+        while (addMonths(now, months + 1) <= target) months++;
+        from = addMonths(now, months);
+      }
+      let diff = target - from;
+      const out = { months };
+
+      if (mode === "seconds") {
+        out.seconds = Math.floor(diff / 1000);
+        return out;
+      }
+      if (mode === "calendar" || mode === "days") {
+        out.days = Math.floor(diff / 86400000);
+        diff -= out.days * 86400000;
+      }
+      out.hours = Math.floor(diff / 3600000);
+      diff -= out.hours * 3600000;
+      out.minutes = Math.floor(diff / 60000);
+      diff -= out.minutes * 60000;
+      out.seconds = Math.floor(diff / 1000);
+      return out;
+    }
+
+    function setValue(el, text) {
+      if (el.textContent === text) return;
+      el.textContent = text;
+      el.classList.remove("tick");
+      void el.offsetWidth; // restart the animation
+      el.classList.add("tick");
+    }
+
     function update() {
       const now = new Date();
 
       if (now >= target) {
-        document.getElementById("countdown").hidden = true;
+        countdownEl.hidden = true;
+        document.querySelector(".modes").hidden = true;
+        document.getElementById("progress").hidden = true;
         document.getElementById("message").hidden = false;
         clearInterval(timer);
         return;
       }
 
-      // Count whole calendar months first, then the remainder
-      let months = 0;
-      while (addMonths(now, months + 1) <= target) months++;
-      let diff = target - addMonths(now, months);
+      const r = remaining(now);
+      for (const unit of modes[mode]) {
+        const n = r[unit];
+        const isPadded = modes[mode].length > 1 && unit !== modes[mode][0];
+        setValue(valueEls[unit], isPadded ? pad(n) : fmt(n));
+      }
 
-      const days = Math.floor(diff / 86400000);
-      diff -= days * 86400000;
-      const hours = Math.floor(diff / 3600000);
-      diff -= hours * 3600000;
-      const minutes = Math.floor(diff / 60000);
-      diff -= minutes * 60000;
-      const seconds = Math.floor(diff / 1000);
-
-      els.months.textContent = months;
-      els.days.textContent = days;
-      els.hours.textContent = pad(hours);
-      els.minutes.textContent = pad(minutes);
-      els.seconds.textContent = pad(seconds);
+      const pct = Math.min(100, Math.max(0, ((now - lastEid) / (target - lastEid)) * 100));
+      document.getElementById("progressFill").style.width = pct + "%";
+      document.getElementById("progressPct").textContent = pct.toFixed(1) + "%";
     }
 
+    document.querySelectorAll(".modes button").forEach((b) => {
+      b.addEventListener("click", () => {
+        mode = b.dataset.mode;
+        store.set("mode", mode);
+        buildUnits();
+        update();
+      });
+    });
+
+    buildUnits();
     const timer = setInterval(update, 1000);
     update();
+
+    // ----- Moon phases -----
+    const phases = [
+      ["🌙", "Crescent: the sighting that begins Ramadan"],
+      ["🌑", "New moon"],
+      ["🌒", "Waxing crescent"],
+      ["🌓", "First quarter"],
+      ["🌔", "Waxing gibbous"],
+      ["🌕", "Full moon: the middle of the month"],
+      ["🌖", "Waning gibbous"],
+      ["🌗", "Last quarter"],
+      ["🌘", "Waning crescent"],
+    ];
+    let phase = 0;
+    const moon = document.getElementById("moon");
+    moon.addEventListener("click", () => {
+      phase = (phase + 1) % phases.length;
+      moon.textContent = phases[phase][0];
+      moon.style.transform = `rotate(${phase * 40}deg)`;
+      setTimeout(() => (moon.style.transform = ""), 400);
+      document.getElementById("moonHint").textContent = phases[phase][1];
+    });
+
+    // ----- Preparation checklist -----
+    const tasks = [
+      "Plan suhoor and iftar meals",
+      "Set a Quran reading goal",
+      "Make up any missed fasts",
+      "Choose a charity to support",
+      "Start adjusting your sleep schedule",
+      "Share the countdown with family",
+    ];
+    const done = store.get("checklist", {});
+    const listEl = document.getElementById("checklist");
+
+    function updateReadyCount() {
+      const count = tasks.filter((t) => done[t]).length;
+      document.getElementById("readyCount").textContent = `${count} of ${tasks.length} done`;
+      if (count === tasks.length) launchStars(12);
+    }
+
+    tasks.forEach((task) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<label><input type="checkbox"><span></span></label>`;
+      li.querySelector("span").textContent = task;
+      const box = li.querySelector("input");
+      box.checked = !!done[task];
+      box.addEventListener("change", () => {
+        done[task] = box.checked;
+        store.set("checklist", done);
+        updateReadyCount();
+      });
+      listEl.appendChild(li);
+    });
+    updateReadyCount();
+
+    // ----- Share -----
+    const shareBtn = document.getElementById("share");
+    shareBtn.addEventListener("click", async () => {
+      const days = Math.ceil((target - new Date()) / 86400000);
+      const text = days > 0
+        ? `Only ${days} days until Ramadan 1448! 🌙`
+        : "Ramadan Mubarak! 🌙";
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: "Ramadan Countdown", text, url: location.href });
+          return;
+        }
+        await navigator.clipboard.writeText(`${text} ${location.href}`);
+        shareBtn.textContent = "Copied to clipboard!";
+      } catch {
+        shareBtn.textContent = text;
+      }
+      setTimeout(() => (shareBtn.textContent = "Share countdown"), 2500);
+    });
+
+    // ----- Starry sky with shooting stars -----
+    const canvas = document.getElementById("sky");
+    const ctx = canvas.getContext("2d");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let stars = [];
+    let shooting = [];
+
+    function resize() {
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = innerWidth * dpr;
+      canvas.height = innerHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const count = Math.floor((innerWidth * innerHeight) / 6000);
+      stars = Array.from({ length: count }, () => ({
+        x: Math.random() * innerWidth,
+        y: Math.random() * innerHeight,
+        r: Math.random() * 1.3 + 0.2,
+        speed: Math.random() * 0.02 + 0.005,
+        t: Math.random() * Math.PI * 2,
+      }));
+    }
+
+    function addShootingStar(x, y) {
+      const angle = Math.PI / 4 + (Math.random() - 0.5) * 0.6;
+      shooting.push({ x, y, vx: Math.cos(angle) * 9, vy: Math.sin(angle) * 9, life: 1 });
+    }
+
+    function launchStars(n) {
+      for (let i = 0; i < n; i++) {
+        setTimeout(() => addShootingStar(Math.random() * innerWidth * 0.8, Math.random() * innerHeight * 0.4), i * 120);
+      }
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, innerWidth, innerHeight);
+      for (const s of stars) {
+        if (!reduceMotion) s.t += s.speed;
+        ctx.globalAlpha = 0.4 + Math.sin(s.t) * 0.35 + 0.25;
+        ctx.fillStyle = "#fff8e1";
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      for (const s of shooting) {
+        ctx.globalAlpha = s.life;
+        const grad = ctx.createLinearGradient(s.x, s.y, s.x - s.vx * 8, s.y - s.vy * 8);
+        grad.addColorStop(0, "#ffe9a8");
+        grad.addColorStop(1, "rgba(255, 233, 168, 0)");
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y);
+        ctx.lineTo(s.x - s.vx * 8, s.y - s.vy * 8);
+        ctx.stroke();
+        s.x += s.vx;
+        s.y += s.vy;
+        s.life -= 0.015;
+      }
+      shooting = shooting.filter((s) => s.life > 0);
+      ctx.globalAlpha = 1;
+      requestAnimationFrame(draw);
+    }
+
+    // Tap anywhere that isn't a control to launch a shooting star
+    document.addEventListener("click", (e) => {
+      if (e.target.closest("button, label, input, a")) return;
+      addShootingStar(e.clientX, e.clientY);
+    });
+
+    addEventListener("resize", resize);
+    resize();
+    draw();
   </script>
 </body>
 </html>
